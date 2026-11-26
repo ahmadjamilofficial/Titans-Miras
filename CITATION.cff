@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this educational code, please cite the repository and the original research papers."
+title: "Titans-Miras: Neural Memory Sequence Modelling Lab"
+authors:
+  - family-names: Jamil
+    given-names: Ahmad
+version: 0.1.0
+date-released: 2026-11-26
+url: "https://github.com/ahmadjamilofficial/Titans-Miras"
+license: MIT
