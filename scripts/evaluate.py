@@ -24,6 +24,8 @@ def main():
     p.add_argument("--seed", type=int, default=1234)
     p.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     args = p.parse_args()
+    if args.batches < 1 or args.batch_size < 1:
+        raise ValueError("batches and batch-size must be positive")
 
     checkpoint_path = Path(args.checkpoint)
     ckpt = torch.load(checkpoint_path, map_location=args.device, weights_only=False)
@@ -42,30 +44,43 @@ def main():
     results = []
 
     for length in args.lengths:
+        if length < 1:
+            raise ValueError("evaluation lengths must be positive")
         if cfg["model"] == "transformer" and length > cfg.get("max_seq_len", 2048):
             print(f"Skipping length={length}: exceeds Transformer max context.")
             continue
         batch_losses, batch_accuracies = [], []
         surprise_values, gate_values = [], []
+        predicted_sum = torch.zeros(vocab, dtype=torch.float64)
+        target_counts = torch.zeros(vocab, dtype=torch.float64)
+        confidence_values = []
         for _ in range(args.batches):
             batch = data.sample(args.batch_size, length, args.device)
             x, y = split_inputs(batch)
             with torch.no_grad():
                 logits, diag = model(x)
+                probs = logits.softmax(dim=-1)
                 batch_losses.append(F.cross_entropy(
                     logits.reshape(-1, vocab), y.reshape(-1)
                 ).item())
                 batch_accuracies.append((logits.argmax(-1) == y).float().mean().item())
+                predicted_sum += probs.sum(dim=(0, 1)).cpu().double()
+                target_counts += torch.bincount(y.reshape(-1).cpu(), minlength=vocab).double()
+                confidence_values.append(probs.max(dim=-1).values.mean().item())
                 if diag:
                     surprise_values.append(diag["surprise"].mean().item())
                     gate_values.append(diag["write_gate"].mean().item())
         ce = sum(batch_losses) / len(batch_losses)
+        total_tokens = float(target_counts.sum())
         row = {
             "sequence_length": length,
             "cross_entropy": ce,
             "perplexity": float(torch.exp(torch.tensor(ce))),
             "accuracy": sum(batch_accuracies) / len(batch_accuracies),
             "cross_entropy_std": float(torch.tensor(batch_losses).std(unbiased=False)),
+            "mean_confidence": sum(confidence_values) / len(confidence_values),
+            "target_token_distribution": (target_counts / total_tokens).tolist(),
+            "predicted_token_distribution": (predicted_sum / total_tokens).tolist(),
         }
         if surprise_values:
             row["mean_surprise"] = sum(surprise_values) / len(surprise_values)
