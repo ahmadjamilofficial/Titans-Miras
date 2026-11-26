@@ -1,0 +1,14 @@
+seed: 42
+vocab_size: 32
+d_model: 96
+memory_size: 128
+num_layers: 2
+num_heads: 4
+dropout: 0.1
+train_seq_len: 64
+eval_seq_lengths: [32, 64, 128, 256]
+batch_size: 32
+steps: 1200
+learning_rate: 0.0005
+weight_decay: 0.01
+log_every: 50
