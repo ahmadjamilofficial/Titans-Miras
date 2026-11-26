@@ -75,7 +75,11 @@ python scripts/plot_results.py --runs-dir runs --output-dir reports
 pytest
 ```
 
-## 6. Graph catalogue
+## 6. Automatic GitHub demo
+
+A GitHub Actions workflow runs the tests, performs a small CPU training run for both models, evaluates context lengths, and uploads checkpoints, metrics, and generated PNG graphs as the artifact `titans-miras-demo-results`. Trigger it manually from the repository's **Actions** tab using **Train demo and generate research plots**, or let it run after relevant changes to `main`. Artifacts are retained for 14 days. The workflow is a smoke demonstration, not a full research-scale training run.
+
+## 7. Graph catalogue
 
 Training plots are created automatically by `train.py`; evaluation plots by `evaluate.py`; cross-run comparisons by `plot_results.py`.
 
@@ -102,7 +106,7 @@ Training plots are created automatically by `train.py`; evaluation plots by `eva
 
 Plots are based on actual measured histories/evaluations, except the sequence-length histogram, which depicts the benchmark sampling protocol. Multi-seed comparison plots include standard-deviation error bars when multiple seed runs are available. No model scores are fabricated.
 
-## 7. Synthetic distribution-prediction task
+## 8. Synthetic distribution-prediction task
 
 Each sequence is sampled from a latent regime-conditioned Markov process. Each regime has a different token-transition probability matrix, and the regime label is hidden from the model. The model sees token IDs and predicts a probability distribution for the next token.
 
@@ -115,7 +119,7 @@ Evaluation reports:
 
 This is a controlled synthetic benchmark, not a real-language corpus or pretrained-model benchmark.
 
-## 8. Memory model (prototype equations)
+## 9. Memory model (prototype equations)
 
 For token embedding (x_t) and memory state (m_{t-1}):
 
@@ -132,7 +136,7 @@ m_t=m_{t-1}+g_t\,\sigma(\alpha s_t)(c_t-m_{t-1})
 
 The prediction head maps (x_t+r_t) to next-token logits. The optional retention term penalizes final-state energy. See [architecture notes](docs/ARCHITECTURE.md).
 
-## 9. Suggested experiments
+## 10. Suggested experiments
 
 1. Retention weight: 0, 1e-5, 1e-4, 1e-3.
 2. Memory size: 64, 128, 256.
@@ -143,7 +147,7 @@ The prediction head maps (x_t+r_t) to next-token logits. The optional retention 
 
 Record commit, hardware, seed, config, parameter count, runtime, and checkpoint. Report variation across seeds; do not conclude superiority from a single run.
 
-## 10. Project structure
+## 11. Project structure
 
 ```text
 Titans-Miras/
@@ -164,7 +168,7 @@ Titans-Miras/
 └── README.md
 ```
 
-## 11. Roadmap
+## 12. Roadmap
 
 - [x] Synthetic next-token distribution task.
 - [x] PyTorch recurrent-memory model and Transformer baseline.
@@ -177,6 +181,6 @@ Titans-Miras/
 - [ ] Optional pretrained Hugging Face adapter and real-text evaluation.
 - [ ] Confidence intervals and compute-matched multi-seed studies.
 
-## 12. License and citation
+## 13. License and citation
 
 MIT License. See [LICENSE](LICENSE) and [CITATION.cff](CITATION.cff). Cite the original Titans and MIRAS papers for their research mechanisms. This repository is an independent educational implementation.
