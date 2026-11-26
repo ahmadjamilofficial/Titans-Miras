@@ -106,7 +106,27 @@ Training plots are created automatically by `train.py`; evaluation plots by `eva
 
 Plots are based on actual measured histories/evaluations, except the sequence-length histogram, which depicts the benchmark sampling protocol. Multi-seed comparison plots include standard-deviation error bars when multiple seed runs are available. No model scores are fabricated.
 
-Published reference figures from Google Research, including perplexity-vs-sequence-length and extreme long-context recall graphs, are collected in [Research benchmark graphs](docs/RESEARCH_BENCHMARK_GRAPHS.md). These are external paper results, not results produced by this codebase.\n\n## 8. Synthetic distribution-prediction task
+## 8. Published research benchmarks (Google Research)
+
+The following figures are embedded directly from the Google Research Titans + MIRAS article. They are **published external results**, not measurements from this repository.
+
+### Perplexity as sequence length grows
+
+![Google Research figure: perplexity across sequence lengths for memory variants at 360M and 760M parameter scales](https://storage.googleapis.com/gweb-research2023-media/images/Titans-3-Performance1.width-1250.png)
+
+This figure motivates evaluating how memory depth affects language-modelling quality as context length increases. Lower perplexity is better.
+
+### Extreme long-context recall
+
+![Google Research figure: BABILong accuracy versus sequence length comparing Titans and baseline architectures](https://storage.googleapis.com/gweb-research2023-media/images/Titans-4-Performance2.width-1250.png)
+
+This figure compares recall accuracy as sequences become longer, including Titans and other model families. It motivates needle-in-a-haystack and associative-recall tests.
+
+**Important:** These figures are not a direct performance comparison against the current prototype. Our implementation currently uses a synthetic next-token distribution task; reproducing these published benchmarks requires implementing the corresponding datasets and evaluation protocols.
+
+See [detailed figure notes and benchmark reproduction targets](docs/RESEARCH_BENCHMARK_GRAPHS.md) and the [Google Research article](https://research.google/blog/titans-miras-helping-ai-have-long-term-memory/).
+
+## 9. Synthetic distribution-prediction task
 
 Each sequence is sampled from a latent regime-conditioned Markov process. Each regime has a different token-transition probability matrix, and the regime label is hidden from the model. The model sees token IDs and predicts a probability distribution for the next token.
 
