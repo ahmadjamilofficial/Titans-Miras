@@ -106,7 +106,7 @@ Training plots are created automatically by `train.py`; evaluation plots by `eva
 
 Plots are based on actual measured histories/evaluations, except the sequence-length histogram, which depicts the benchmark sampling protocol. Multi-seed comparison plots include standard-deviation error bars when multiple seed runs are available. No model scores are fabricated.
 
-## 8. Synthetic distribution-prediction task
+Published reference figures from Google Research, including perplexity-vs-sequence-length and extreme long-context recall graphs, are collected in [Research benchmark graphs](docs/RESEARCH_BENCHMARK_GRAPHS.md). These are external paper results, not results produced by this codebase.\n\n## 8. Synthetic distribution-prediction task
 
 Each sequence is sampled from a latent regime-conditioned Markov process. Each regime has a different token-transition probability matrix, and the regime label is hidden from the model. The model sees token IDs and predicts a probability distribution for the next token.
 
