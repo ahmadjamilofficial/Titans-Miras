@@ -2,11 +2,15 @@
 
 ## Scope
 
-The first implementation isolates one idea: a sequence model can carry a learned state forward rather than recomputing all pairwise token interactions at every step.
+This first release compares a small recurrent memory model with causal self-attention on a synthetic next-token distribution task. It is an experimental scaffold for learning and debugging ideas from Titans and MIRAS.
 
-## Memory model
+## Synthetic task
 
-For input embedding x_t and memory state m_(t-1), the module computes a read vector r_t, a discrepancy/surprise scalar s_t, a candidate memory c_t, and a write gate g_t:
+A hidden regime is sampled for each sequence. Every regime owns a different token-transition matrix. The model receives token IDs but not the regime label, and predicts the next-token distribution. The task is intentionally controlled so we can vary sequence lengths and inspect memory behaviour.
+
+## Recurrent memory prototype
+
+For token embedding x_t and memory state m_(t-1), the module computes a read vector r_t, surprise s_t, candidate memory c_t, and write gate g_t:
 
 - r_t = W_r m_(t-1)
 - s_t = RMS(x_t - r_t)
@@ -16,18 +20,22 @@ For input embedding x_t and memory state m_(t-1), the module computes a read vec
 
 The output representation is x_t + r_t. The prediction head maps this representation to vocabulary logits.
 
-This recurrent state is differentiable through the sequence and is trained with next-token cross entropy. The optional retention regularizer penalizes final-state energy. This is a deliberately small teaching model; it is not the Titans paper's exact neural memory module and does not implement its full associative-memory objective or chunkwise update procedure.
+This state is differentiable through the sequence and trained with next-token cross-entropy. The optional retention regularizer penalizes final-state energy. This is a teaching abstraction, not Titans' exact gradient-based associative-memory module or full chunkwise update algorithm.
 
 ## MIRAS-inspired design dimensions
 
-The prototype exposes separable questions for later experiments:
+The broader MIRAS perspective motivates separate experimental choices:
 1. **Memory structure:** vector state versus matrix/associative state.
-2. **Attentional bias:** which token features are read and written.
-3. **Retention:** what information persists or decays.
+2. **Attentional bias:** what information the memory reads and writes.
+3. **Retention:** what information persists, decays, or is overwritten.
 4. **Online optimizer/objective:** how memory updates are computed.
 
-The current code explores a surprise-conditioned write gate and a simple retention penalty only. Do not describe it as a complete MIRAS implementation.
+The current prototype explores a surprise-conditioned write gate and a simple retention penalty only. It must not be described as a complete MIRAS implementation.
 
-## Baseline
+## Transformer baseline
 
-The Transformer baseline uses a causal attention mask and learned positional embeddings. It serves as a familiar reference point, not a perfectly compute-matched benchmark.
+The baseline uses causal self-attention and learned positional embeddings. It is a useful reference but is not automatically compute- or parameter-matched to the recurrent memory model.
+
+## Generated diagnostics
+
+Training histories produce loss, surprise, write-gate, memory norm, gradient norm and loss-histogram plots. Evaluation histories produce context-length loss/perplexity/accuracy, polygon, memory diagnostics, and empirical-versus-predicted token marginal plots. Suite-level plots aggregate across seeds and display standard-deviation error bars when multiple runs exist.
