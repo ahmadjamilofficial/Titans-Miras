@@ -37,7 +37,10 @@ def main():
     fig.tight_layout(); fig.savefig(out / "sequence_length_histogram.png", dpi=160); plt.close(fig)
 
     # Histogram: synthetic token frequencies.
-    tokens = np.random.default_rng(9).choice(32, 10000)
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+    from titans_miras.data import RegimeSequenceGenerator
+    tokens = RegimeSequenceGenerator(vocab_size=32, seed=9).sample(256, 128).numpy().ravel()
     fig, ax = plt.subplots()
     ax.hist(tokens, bins=np.arange(34)-.5, edgecolor="black")
     ax.set(title="Illustrative token-frequency histogram", xlabel="Token ID", ylabel="Frequency")
